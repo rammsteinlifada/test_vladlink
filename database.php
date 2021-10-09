@@ -12,6 +12,7 @@ if ($handle) {
 } else {
     print("Ошибка чтения файла" . "\n");
 }
+@fclose($handle);
 
 if (!$username || !$password) {
     print("Ошибка чтения с файла");
