@@ -3,53 +3,69 @@ $dbname = "testDB";
 $servername = "localhost";
 $username = null;
 $password = null;
+$connection = false;
 
-$handle = @fopen("MySQL.txt", "r");
-if ($handle) {
-    $username = fgets($handle, 1024);
-    $username = rtrim($username, "\n");
-    $password = fgets($handle, 1024);
-} else {
-    print("Ошибка чтения файла" . "\n");
+function getUsernameAndPasswordFromFile(?string &$username, ?string &$password) {
+    $handle = @fopen("MySQL.txt", "r");
+    if ($handle !== false) {
+        $username = rtrim(fgets($handle, 1024), "\n");
+        $password = fgets($handle, 1024);
+    } else {
+        print("Ошибка чтения файла" . "\n");
+    }
+    @fclose($handle);
+    if ($username === false || $password === false) {
+        print("Ошибка чтения с файла");
+    }
 }
-@fclose($handle);
 
-if (!$username || !$password) {
-    print("Ошибка чтения с файла");
+function createTable() {
+    $table = "CREATE TABLE categories (
+        Id INT PRIMARY KEY,
+        Name CHAR(100) NOT NULL,
+        Alias CHAR(30) NOT NULL,
+        ParentId INT,
+        FOREIGN KEY (ParentId) REFERENCES categories(Id)
+    )";
+
+    if ($GLOBALS["connection"]->query($table) === false) {
+        print("Ошибка создания БД " . $GLOBALS["connection"]->error . "\n");
+    } else {
+        print("Успешное создание БД" . "\n");
+    }
 }
 
-// CREATE DATABASE testDB
-//$connection = mysqli_connect($servername, $username, $password);
+function insert(array $categoryArray, ?string $categoryParent) {
+    $connection = new mysqli($GLOBALS["servername"], $GLOBALS["username"],
+                            $GLOBALS["password"], $GLOBALS["dbname"]);
+    $categoryId = $categoryArray["id"];
+    $categoryName = $categoryArray["name"];
+    $categoryAlias = $categoryArray["alias"];
+    if ($categoryParent) {
+        $sql = "SELECT * FROM categories WHERE Alias = ?";
+        $stmt = $connection->prepare($sql);
+        $stmt->bind_param('s', $categoryParent);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $categoryParentId = $result->fetch_row()[0];
+    } else {
+        $categoryParentId = null;
+    }
 
-//$db = "CREATE DATABASE testDB";
+    $sql = "INSERT INTO categories (Id, Name, Alias, ParentId) VALUES (?, ?, ?, ?)";
+    $stmt = $connection->prepare($sql);
+    $stmt->bind_param('issi', $categoryId, $categoryName, $categoryAlias, $categoryParentId);
+    $stmt->execute();
+
+    $connection->close();
+}
+
+getUsernameAndPasswordFromFile($username, $password);
+
+//$connection = new mysqli($servername, $username, $password, $dbname);
+//print($connection->host_info . "\n");
 //
-//if ($connection->query($db) == false) {
-//    print("Ошибка создания БД " . $connection->error . "\n");
-//} else {
-//    print("Успешное создание БД" . "\n");
-//}
-
-//CREATE TABLE categories
-$connection = mysqli_connect($servername, $username, $password, $dbname);
-
-if ($connection == false) {
-    print("Ошибка подключения к серверу " . mysqli_connect_error() . "\n");
-} else {
-    print("Успешное соединение" . "\n");
-}
-
-//$table = "CREATE TABLE categories (
-//    Id INT AUTO_INCREMENT PRIMARY KEY,
-//    Name CHAR(100) NOT NULL,
-//    Alias CHAR(30) NOT NULL,
-//    ParentId INT,
-//    FOREIGN KEY (ParentId) REFERENCES categories(Id)
-//)";
+////createTable();
 //
-//if ($connection->query($table) == false) {
-//    print("Ошибка создания БД " . $connection->error . "\n");
-//} else {
-//    print("Успешное создание БД" . "\n");
-//}
-
-$connection->close();
+//$connection->close();
+//print("close connection" . "\n");
