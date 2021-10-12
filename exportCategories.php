@@ -13,8 +13,28 @@ function exportFromDb(?string $parentId, ?string $route, int $nestingLevel) {
     }
 }
 
+function exportFromDbUntilNestingLevel(?string $parentId,
+                                       int $nestingLevel,
+                                       int $lastNestingLevel) {
+    if ($lastNestingLevel < 0) {
+        return;
+    }
+    if ($nestingLevel > $lastNestingLevel) {
+        return;
+    }
+    $data = getDbData($parentId);
+    while ($row = $data->fetch_row()) {
+        $placeholder = str_repeat("\t", $nestingLevel);
+        $placeholder .= $row[1] . "\n";
+        fwrite($GLOBALS["handle"], $placeholder);
+        exportFromDbUntilNestingLevel($row[0],$nestingLevel + 1, $lastNestingLevel);
+    }
+}
+
 $handle = @fopen("type_a.txt", "w+");
-
 exportFromDb(null, null, 0);
+@fclose($handle);
 
+$handle = @fopen("type_b.txt", "w+");
+exportFromDbUntilNestingLevel(null, 0, 1);
 @fclose($handle);
