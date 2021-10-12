@@ -21,7 +21,7 @@ function getUsernameAndPasswordFromFile(?string &$username, ?string &$password) 
 
 function createTable() {
     $table = "CREATE TABLE categories (
-        Id INT PRIMARY KEY,
+        Id INT PRIMARY KEY NOT NULL,
         Name CHAR(100) NOT NULL,
         Alias CHAR(30) NOT NULL,
         ParentId INT,
@@ -58,6 +58,21 @@ function insert(array $categoryArray, ?string $categoryParent) {
     $stmt->execute();
 
     $connection->close();
+}
+
+function getDbData(?string $ParentId) {
+    $connection = new mysqli($GLOBALS["servername"], $GLOBALS["username"],
+                            $GLOBALS["password"], $GLOBALS["dbname"]);
+    if ($ParentId === null) {
+        $sql = "SELECT * FROM categories WHERE ParentId IS NULL";
+        $stmt = $connection->prepare($sql);
+    } else {
+        $sql = "SELECT * FROM categories WHERE ParentId = ?";
+        $stmt = $connection->prepare($sql);
+        $stmt->bind_param('i', $ParentId);
+    }
+    $stmt->execute();
+    return $stmt->get_result();
 }
 
 getUsernameAndPasswordFromFile($username, $password);

@@ -16,7 +16,7 @@ $json = null;
 $handle = @fopen("categories.json", "r");
 
 if ($handle !== false) {
-    $json = fgets($handle, 10000);
+    $json = fgets($handle);
 } else {
     print("Ошибка чтения файла" . "\n");
     return;
