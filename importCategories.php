@@ -22,7 +22,7 @@ if ($handle !== false) {
     return;
 }
 
-@fclose($handle);
+fclose($handle);
 
 if ($json === false) {
     print("Ошибка чтения с файла" . "\n");

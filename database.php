@@ -8,12 +8,12 @@ $connection = false;
 function getUsernameAndPasswordFromFile(?string &$username, ?string &$password) {
     $handle = @fopen("MySQL.txt", "r");
     if ($handle !== false) {
-        $username = rtrim(fgets($handle, 1024), "\n");
-        $password = fgets($handle, 1024);
+        $username = rtrim(fgets($handle), "\n");
+        $password = fgets($handle);
     } else {
         print("Ошибка чтения файла" . "\n");
     }
-    @fclose($handle);
+    fclose($handle);
     if ($username === false || $password === false) {
         print("Ошибка чтения с файла");
     }
@@ -60,7 +60,7 @@ function insert(array $categoryArray, ?string $categoryParent) {
     $connection->close();
 }
 
-function getDbData(?string $ParentId) {
+function getDbData(?int $ParentId) {
     $connection = new mysqli($GLOBALS["servername"], $GLOBALS["username"],
                             $GLOBALS["password"], $GLOBALS["dbname"]);
     if ($ParentId === null) {

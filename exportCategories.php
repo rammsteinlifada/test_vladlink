@@ -2,7 +2,7 @@
 
 include('database.php');
 
-function exportFromDb(?string $parentId, ?string $route, int $nestingLevel) {
+function exportFromDb(?int $parentId, ?string $route, int $nestingLevel) {
     $data = getDbData($parentId);
     while ($row = $data->fetch_row()) {
         $nextRoute = "/" . $row[2];
@@ -13,7 +13,7 @@ function exportFromDb(?string $parentId, ?string $route, int $nestingLevel) {
     }
 }
 
-function exportFromDbUntilNestingLevel(?string $parentId,
+function exportFromDbUntilNestingLevel(?int $parentId,
                                        int $nestingLevel,
                                        int $lastNestingLevel) {
     if ($lastNestingLevel < 0) {
@@ -33,8 +33,8 @@ function exportFromDbUntilNestingLevel(?string $parentId,
 
 $handle = @fopen("type_a.txt", "w+");
 exportFromDb(null, null, 0);
-@fclose($handle);
+fclose($handle);
 
 $handle = @fopen("type_b.txt", "w+");
 exportFromDbUntilNestingLevel(null, 0, 1);
-@fclose($handle);
+fclose($handle);
