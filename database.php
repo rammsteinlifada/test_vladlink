@@ -64,7 +64,7 @@ function insert(array $categoryArray, ?string $categoryParent) {
     $connection->close();
 }
 
-function getDbData(?int $ParentId) {
+function getDbDataByParentId(?int $ParentId) {
     $connection = new mysqli($GLOBALS["servername"], $GLOBALS["username"],
                             $GLOBALS["password"], $GLOBALS["dbname"]);
     if ($ParentId === null) {
