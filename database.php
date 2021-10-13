@@ -20,6 +20,8 @@ function getUsernameAndPasswordFromFile(?string &$username, ?string &$password) 
 }
 
 function createTable() {
+    $connection = new mysqli($GLOBALS["servername"], $GLOBALS["username"],
+                            $GLOBALS["password"], $GLOBALS["dbname"]);
     $table = "CREATE TABLE categories (
         Id INT PRIMARY KEY NOT NULL,
         Name CHAR(100) NOT NULL,
@@ -28,11 +30,13 @@ function createTable() {
         FOREIGN KEY (ParentId) REFERENCES categories(Id)
     )";
 
-    if ($GLOBALS["connection"]->query($table) === false) {
-        print("Ошибка создания БД " . $GLOBALS["connection"]->error . "\n");
+    if ($connection->query($table) === false) {
+        print("Ошибка создания БД " . $connection->error . "\n");
     } else {
         print("Успешное создание БД" . "\n");
     }
+
+    $connection->close();
 }
 
 function insert(array $categoryArray, ?string $categoryParent) {
@@ -76,11 +80,3 @@ function getDbData(?int $ParentId) {
 }
 
 getUsernameAndPasswordFromFile($username, $password);
-
-//$connection = new mysqli($servername, $username, $password, $dbname);
-//print($connection->host_info . "\n");
-//
-////createTable();
-//
-//$connection->close();
-//print("close connection" . "\n");
