@@ -12,21 +12,23 @@ function importToDb(array $categories, ?string $parent) {
     }
 }
 
-$json = null;
-$handle = @fopen("categories.json", "r");
+function getDataFromJson(string $file) {
+    $handle = @fopen($file, "r");
 
-if ($handle !== false) {
-    $json = fgets($handle);
-} else {
-    print("Ошибка чтения файла" . "\n");
-    return;
+    if ($handle !== false) {
+        $json = fgets($handle);
+    } else {
+        print("Ошибка чтения файла" . "\n");
+        return null;
+    }
+
+    fclose($handle);
+
+    if ($json === false) {
+        print("Ошибка чтения с файла" . "\n");
+    }
+    return json_decode($json, true);
 }
 
-fclose($handle);
-
-if ($json === false) {
-    print("Ошибка чтения с файла" . "\n");
-}
-$decodedJson = json_decode($json, true);
-
+$decodedJson = getDataFromJson("categories.json");
 importToDb($decodedJson, null);
