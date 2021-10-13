@@ -5,9 +5,9 @@
     <body>
         <pre>
 <?php
-    include('exportCategories.php');
-    $handle = @fopen("tmp.txt", "w+");
-    exportFromDbUntilNestingLevel(null, 0, 1024);
+    include('categoriesManager.php');
+    $handle = fopen("tmp.txt", "w+");
+    categoriesManager::exportFromDbUntilNestingLevel(null, 0, 1024, $handle);
     rewind($handle);
     if ($handle !== false) {
         $string = fgets($handle);

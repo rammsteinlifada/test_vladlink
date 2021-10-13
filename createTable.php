@@ -1,4 +1,4 @@
 <?php
-    include('database.php');
+    include('databaseClient.php');
 
-    createTable();
+    (new databaseClient)->createTable();
